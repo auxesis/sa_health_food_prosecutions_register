@@ -18,13 +18,28 @@ def get(url)
   @agent.get(url)
 end
 
+# This attemps to solve a complicated problem where the information is spread
+# across multiple elements. This finds all the elements until the next "header"
+# (a strong element), then converts them all to text.
+def extract_multiline(name, page, opts={})
+  options = { :scrub => false }.merge(opts)
+  start_el = page.find {|e| e.text =~ /#{name}/i}
+  els = [start_el]
+  current = start_el.next
+  until current.children.find {|c| c.name == 'strong'} do
+    els << current
+    current = current.next
+  end
+  text = els.map(&:text).join
+  standalone = text[/#{name}\**:[[:space:]](.*)/im, 1]
+  options[:scrub] ? scrub(standalone) : standalone
+end
+
 def extract_attrs(page)
   attrs = {}
 
   # Address of business
-  text = page.find {|e| e.text =~ /address of business/i}.text
-  attrs['address'] = text[/^address of business:.(.*)/i, 1]
-  # FIXME(auxesis) needs multiline
+  attrs['address'] = extract_multiline('address of business', page)
   return nil if attrs['address'].blank?
 
   # Trading name
@@ -32,26 +47,13 @@ def extract_attrs(page)
   attrs['trading_name'] = text[/^trading name\*:.(.*)/i, 1]
 
   # Name of convicted
-  text = page.find {|e| e.text =~ /name of convicted/i}.text
-  attrs['name_of_convicted'] = text[/^name of convicted\*:.(.*)/i, 1]
-  # FIXME(auxesis) needs multiline
+  attrs['name_of_convicted'] = extract_multiline('name of convicted', page)
 
   # Date of offence
-  text = page.find {|e| e.text =~ /date of offence/i}.text
-  attrs['date_of_offence'] = text[/^date of offence:.(.*)/i, 1]
+  attrs['date_of_offence'] = extract_multiline('date of offence', page)
 
   # Nature and circumstances of offence
-  # This is complicated and fucked up because the information is spread across
-  # multiple elements. This finds all the elements until the next "header"
-  # (a strong element), then converts them all to text.
-  start_el = page.find {|e| e.text =~ /nature and circumstances of offence/i}
-  els = [start_el]
-  current = start_el.next
-  until current.children.find {|c| c.name == 'strong'} do
-    els << current
-    current = current.next
-  end
-  attrs['offence_nature'] = els.map {|e| e.text}.join
+  attrs['offence_nature'] = extract_multiline('nature and circumstances of offence', page)
 
   # Court decision date
   text = page.find {|e| e.text =~ /court decision date/i}.text
