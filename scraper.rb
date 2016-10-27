@@ -16,7 +16,8 @@ end
 
 def get(url)
   @agent ||= Mechanize.new
-  @agent.get(url)
+  response = @agent.get(url)
+  Nokogiri::HTML(response)
 end
 
 # This attemps to solve a complicated problem where the information is spread
