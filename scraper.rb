@@ -32,7 +32,7 @@ def extract_multiline(name, page, opts={})
   end
   text = els.map(&:text).join
   standalone = text[/#{name}\**:[[:space:]](.*)/im, 1]
-  options[:scrub] ? scrub(standalone) : standalone
+  options[:scrub] ? scrub(standalone) : standalone.strip
 end
 
 def extract_attrs(page)
