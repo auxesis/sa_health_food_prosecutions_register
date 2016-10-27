@@ -171,9 +171,6 @@ def main
   new_prosecutions.map! {|p| build_prosecution(p, page) }.compact!
   new_prosecutions.map! {|p| geocode(p) }
 
-  binding.pry
-
-  exit
   # Serialise
   ScraperWiki.save_sqlite(['link'], new_prosecutions)
 
