@@ -2,6 +2,8 @@ require 'scraperwiki'
 require 'mechanize'
 require 'geokit'
 require 'pry'
+require 'active_support'
+require 'active_support/core_ext'
 
 # Set an API key if provided
 Geokit::Geocoders::GoogleGeocoder.api_key = ENV['MORPH_GOOGLE_API_KEY'] if ENV['MORPH_GOOGLE_API_KEY']
@@ -11,13 +13,14 @@ def get(url)
   @agent.get(url)
 end
 
-def extract_detail(page)
-  details = {}
+def extract_attrs(page)
+  attrs = {}
 
   text = page.find {|e| e.text =~ /address of business/i}.text
-  details['address'] = text[/^address of business:.(.*)/i, 1]
+  attrs['address'] = text[/^address of business:.(.*)/i, 1]
+  return nil if attrs['address'].blank?
 
-  return details
+  attrs
 end
 
 def extract_ids(page)
@@ -29,10 +32,10 @@ def extract_ids(page)
   }
 end
 
-def build_prosecution(prosecution, page)
+def build_prosecution(attrs, page)
   doc = Nokogiri::HTML(page.body) {|c| c.noblanks}
   elements = doc.search('div.wysiwyg').first.children
-  header = elements.search("//a[@id='#{prosecution['id']}']").first.parent
+  header = elements.search("//a[@id='#{attrs['id']}']").first.parent
 
   els = [header]
   current = header.next
@@ -41,9 +44,12 @@ def build_prosecution(prosecution, page)
     current = current.next
   end
 
-  details = extract_detail(els)
-  puts "Extracting #{details['address']}"
-  details
+  if more_attrs = extract_attrs(els)
+    puts "Extracting #{more_attrs['address']}"
+    attrs.merge(more_attrs)
+  else
+    nil
+  end
 end
 
 def geocode(notice)
@@ -87,13 +93,8 @@ def main
   new_prosecutions = prosecutions.select {|r| !existing_record_ids.include?(r['link']) }
   puts "### There are #{new_prosecutions.size} new prosecutions"
 
-  new_prosecutions.map! {|p| build_prosecution(p, page) }
-
-  binding.pry
-
-  #new_prosecutions.map! {|n| geocode(n) }
-
-  exit
+  new_prosecutions.map! {|p| build_prosecution(p, page) }.compact!
+  new_prosecutions.map! {|n| geocode(n) }
 
   # Serialise
   ScraperWiki.save_sqlite(['link'], new_prosecutions)
