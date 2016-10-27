@@ -41,6 +41,17 @@ def extract_attrs(page)
   attrs['date_of_offence'] = text[/^date of offence:.(.*)/i, 1]
 
   # Nature and circumstances of offence
+  # This is complicated and fucked up because the information is spread across
+  # multiple elements. This finds all the elements until the next "header"
+  # (a strong element), then converts them all to text.
+  start_el = page.find {|e| e.text =~ /nature and circumstances of offence/i}
+  els = [start_el]
+  current = start_el.next
+  until current.children.find {|c| c.name == 'strong'} do
+    els << current
+    current = current.next
+  end
+  attrs['offence_nature'] = els.map {|e| e.text}.join
 
   # Court decision date
   text = page.find {|e| e.text =~ /court decision date/i}.text
