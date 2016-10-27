@@ -16,7 +16,9 @@ end
 
 def get(url)
   @agent ||= Mechanize.new
-  @agent.get(url)
+  response = @agent.get(url)
+  p response.class
+  response
 end
 
 # This attemps to solve a complicated problem where the information is spread
