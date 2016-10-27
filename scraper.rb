@@ -1,4 +1,5 @@
 require 'scraperwiki'
+require 'nokogiri'
 require 'mechanize'
 require 'geokit'
 require 'pry'
