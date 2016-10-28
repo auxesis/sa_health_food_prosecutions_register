@@ -16,6 +16,7 @@ end
 
 def get(url)
   @agent ||= Mechanize.new
+  @agent.user_agent_alias = 'Windows Firefox'
   page = @agent.get(url)
   p page.class
   p page.header
