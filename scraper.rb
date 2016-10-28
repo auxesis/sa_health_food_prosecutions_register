@@ -167,16 +167,6 @@ rescue SqliteMagic::NoSuchTable
   []
 end
 
-puts '### home'
-get('http://www.sahealth.sa.gov.au/wps/wcm/connect/public+content/sa+health+internet')
-puts '### image'
-get('http://www.sahealth.sa.gov.au/wps/wcm/connect/9958778047200f53bf0dff2e504170d4/Inter_Finalists.jpg?MOD=AJPERES&CACHEID=9958778047200f53bf0dff2e504170d4')
-puts '### base'
-get(base)
-puts '### 404'
-get('http://www.sahealth.sa.gov.au/404')
-exit
-
 def main
   page = get(base)
   prosecutions = extract_ids(page)
