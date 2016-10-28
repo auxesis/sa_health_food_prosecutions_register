@@ -16,11 +16,11 @@ end
 
 def get(url)
   @agent ||= Mechanize.new
-  response = @agent.get(url)
-  p response.class
+  page = @agent.get(url)
+  p page.class
   p page.header
   puts page.content
-  response
+  page
 end
 
 # This attemps to solve a complicated problem where the information is spread
