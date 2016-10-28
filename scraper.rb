@@ -24,8 +24,6 @@ def get(url)
   page
 end
 
-get('http://l.fractio.nl/request_from_morph')
-
 # This attemps to solve a complicated problem where the information is spread
 # across multiple elements. This finds all the elements until the next "header"
 # (a strong element), then converts them all to text.
@@ -167,6 +165,16 @@ def existing_record_ids
 rescue SqliteMagic::NoSuchTable
   []
 end
+
+puts '### home'
+get('http://www.sahealth.sa.gov.au/wps/wcm/connect/public+content/sa+health+internet')
+puts '### image'
+get('http://www.sahealth.sa.gov.au/wps/wcm/connect/9958778047200f53bf0dff2e504170d4/Inter_Finalists.jpg?MOD=AJPERES&CACHEID=9958778047200f53bf0dff2e504170d4')
+puts '### base'
+get(base)
+puts '### 404'
+get('http://www.sahealth.sa.gov.au/404')
+exit
 
 def main
   page = get(base)
