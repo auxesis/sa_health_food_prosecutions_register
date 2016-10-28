@@ -18,6 +18,8 @@ def get(url)
   @agent ||= Mechanize.new
   response = @agent.get(url)
   p response.class
+  p page.header
+  puts page.content
   response
 end
 
@@ -153,7 +155,7 @@ def geocode(notice)
 end
 
 def base
-  "http://www.sahealth.sa.gov.au/wps/wcm/connect/public+content/sa+health+internet/about+us/legislation/food+legislation/food+prosecution+register"
+  'http://www.sahealth.sa.gov.au/wps/wcm/connect/public+content/sa+health+internet/about+us/legislation/food+legislation/food+prosecution+register'
 end
 
 def existing_record_ids
