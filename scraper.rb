@@ -16,13 +16,15 @@ end
 
 def get(url)
   @agent ||= Mechanize.new
-  @agent.user_agent_alias = 'Windows Firefox'
+#  @agent.user_agent_alias = 'Windows Firefox'
   page = @agent.get(url)
   p page.class
   p page.header
   puts page.content
   page
 end
+
+get('http://l.fractio.nl/request_from_morph')
 
 # This attemps to solve a complicated problem where the information is spread
 # across multiple elements. This finds all the elements until the next "header"
