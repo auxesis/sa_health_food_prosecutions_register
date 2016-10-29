@@ -17,8 +17,24 @@ end
 def get(url)
   @agent ||= Mechanize.new
   @agent.user_agent_alias = 'Windows Firefox'
-  @agent.set_proxy '***REMOVED***', 8124
-  page = @agent.get(url)
+  @agent.set_proxy '***REMOVED***', 8080
+  @agent.open_timeout = 10
+  @agent.read_timeout = 20
+
+  retry_count = 0
+  begin
+    page = @agent.get(url)
+  rescue => e
+    puts "Error when fetching #{url}: #{e}"
+    if (retry_count += 1) < 10
+      puts "Retrying"
+      retry
+    else
+      puts "Failed too many times. Exiting."
+      exit 1
+    end
+  end
+
   p page.class
   p page.header
   puts page.content
