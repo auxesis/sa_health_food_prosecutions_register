@@ -5,6 +5,7 @@ require 'geokit'
 require 'pry'
 require 'active_support'
 require 'active_support/core_ext'
+require 'reverse_markdown'
 
 # Set an API key if provided
 Geokit::Geocoders::GoogleGeocoder.api_key = ENV['MORPH_GOOGLE_API_KEY'] if ENV['MORPH_GOOGLE_API_KEY']
@@ -45,7 +46,7 @@ end
 # across multiple elements. This finds all the elements until the next "header"
 # (a strong element), then converts them all to text.
 def extract_multiline(name, page, opts={})
-  options = { :scrub => false }.merge(opts)
+  options = { :scrub => false, :markdown => false }.merge(opts)
   start_el = page.find {|e| e.text =~ /#{name}/i}
   els = [start_el]
   current = start_el.next
@@ -53,9 +54,14 @@ def extract_multiline(name, page, opts={})
     els << current
     current = current.next
   end
-  text = els.map(&:text).join
-  standalone = text[/#{name}\**:[[:space:]](.*)/im, 1]
-  options[:scrub] ? scrub(standalone) : standalone.strip
+  if options[:markdown]
+    html = els[1..-1].map(&:to_s).join
+    ReverseMarkdown.convert(html)
+  else
+    text = els.map(&:text).join
+    standalone = text[/#{name}\**:[[:space:]](.*)/im, 1]
+    options[:scrub] ? scrub(standalone) : standalone.strip
+  end
 end
 
 def extract_attrs(page)
@@ -76,7 +82,7 @@ def extract_attrs(page)
   attrs['date_of_offence'] = extract_multiline('date of offence', page)
 
   # Nature and circumstances of offence
-  attrs['offence_nature'] = extract_multiline('nature and circumstances of offence', page)
+  attrs['offence_nature'] = extract_multiline('nature and circumstances of offence', page, :markdown => true)
 
   # Court decision date
   text = page.find {|e| e.text =~ /court decision date/i}.text
