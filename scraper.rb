@@ -18,9 +18,9 @@ end
 def get(url)
   @agent ||= Mechanize.new
   @agent.user_agent_alias = 'Windows Firefox'
-  @agent.set_proxy '***REMOVED***', 8080
-  @agent.open_timeout = 10
-  @agent.read_timeout = 20
+  @agent.set_proxy '***REMOVED***', ***REMOVED***
+  @agent.open_timeout = 60
+  @agent.read_timeout = 60
 
   retry_count = 0
   begin
