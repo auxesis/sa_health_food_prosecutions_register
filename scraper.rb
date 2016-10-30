@@ -1,3 +1,10 @@
+# Usage: bundle exec ruby scraper.rb
+#
+# Environment variables:
+#
+#  - MORPH_GOOGLE_API_KEY: Google Maps API key
+#  - MORPH_PROXY: proxy to make requests through, in the format of 'HOST:PORT'
+
 require 'scraperwiki'
 require 'nokogiri'
 require 'mechanize'
