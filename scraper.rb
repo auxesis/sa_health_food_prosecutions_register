@@ -43,9 +43,6 @@ def get(url)
     end
   end
 
-  p page.class
-  p page.header
-  puts page.content
   page
 end
 
