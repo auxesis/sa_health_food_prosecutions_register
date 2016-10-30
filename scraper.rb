@@ -25,7 +25,11 @@ end
 def get(url)
   @agent ||= Mechanize.new
   @agent.user_agent_alias = 'Windows Firefox'
-  @agent.set_proxy '***REMOVED***', ***REMOVED***
+  if ENV['MORPH_PROXY']
+    host, port = ENV['MORPH_PROXY'].split(':')
+    @agent.set_proxy host, port
+    puts "Using proxy for request to #{url}"
+  end
   @agent.open_timeout = 60
   @agent.read_timeout = 60
 
