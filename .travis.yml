@@ -7,13 +7,7 @@ script:
   - cd proxy && ./cibuild.sh
 deploy:
   provider: script
-  script:
-    - pwd
-    - ls -l
-    - cd $TRAVIS_BUILD_DIR
-    - pwd
-    - ls -l
-    #- cd proxy && ./cideploy.sh
+  script: ./cideploy.sh
   on:
     branch: master
 env:
