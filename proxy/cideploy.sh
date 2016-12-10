@@ -10,4 +10,8 @@ set -x
 #mv terraform bin
 export PATH="$PATH:$(pwd)/bin"
 
+ls -lah
+
+pwd
+
 #make apply
