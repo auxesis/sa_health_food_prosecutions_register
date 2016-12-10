@@ -1,6 +1,8 @@
-language: ruby
+language: go
 rvm:
-  - 2.3.1
+  - 1.x
+install:
+  - true
 script:
   - proxy/cibuild.sh
 deploy:
