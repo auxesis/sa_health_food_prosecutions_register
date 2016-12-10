@@ -14,4 +14,9 @@ ls -lah
 
 pwd
 
+echo $0
+echo $@
+
+#make plan
+
 #make apply
