@@ -8,7 +8,9 @@ script:
 deploy:
   provider: script
   script:
-  - cd proxy && ./cideploy.sh
+    - pwd
+    - ls -l
+    #- cd proxy && ./cideploy.sh
   on:
     branch: master
 env:
