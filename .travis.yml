@@ -2,10 +2,10 @@ language: go
 install:
 - true
 script:
-- cd proxy && ./cibuild.sh
+- "proxy/cibuild.sh"
 deploy:
   provider: script
-  script: "./cideploy.sh"
+  script: "proxy/cideploy.sh"
   on:
     branch: master
 env:
