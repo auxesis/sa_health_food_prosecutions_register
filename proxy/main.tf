@@ -2,7 +2,7 @@
 provider "aws" {
 	access_key = "${var.aws_access_key}"
 	secret_key = "${var.aws_secret_key}"
-	region = "us-east-1"
+	region = "${var.aws_region}"
 }
 
 resource "aws_vpc" "proxy" {
@@ -18,18 +18,18 @@ resource "aws_internet_gateway" "proxy" {
 }
 
 # Public subnets
-resource "aws_subnet" "us-east-1b-public" {
+resource "aws_subnet" "public" {
 	vpc_id = "${aws_vpc.proxy.id}"
 
 	cidr_block = "10.1.0.0/24"
-	availability_zone = "us-east-1b"
+	availability_zone = "${element(split(",", var.aws_availability_zones), 0)}"
 	tags {
 		Name = "sa_health_food_prosecutions_register"
 	}
 }
 
 # Routing table for public subnets
-resource "aws_route_table" "us-east-1-public" {
+resource "aws_route_table" "public" {
 	vpc_id = "${aws_vpc.proxy.id}"
 
 	route {
@@ -42,9 +42,9 @@ resource "aws_route_table" "us-east-1-public" {
 	}
 }
 
-resource "aws_route_table_association" "us-east-1b-public" {
-	subnet_id = "${aws_subnet.us-east-1b-public.id}"
-	route_table_id = "${aws_route_table.us-east-1-public.id}"
+resource "aws_route_table_association" "public" {
+	subnet_id = "${aws_subnet.public.id}"
+	route_table_id = "${aws_route_table.public.id}"
 }
 
 # morph access to elb
@@ -58,7 +58,7 @@ resource "aws_security_group" "elb" {
 		from_port = 8888
 		to_port = 8888
 		protocol = "tcp"
-		cidr_blocks = ["50.116.3.88/32"]
+		cidr_blocks = ["${split(",", var.morph_cidrs)}"]
 	}
 
 	# Outbound internet access
@@ -112,7 +112,7 @@ resource "aws_security_group" "proxy" {
 resource "aws_elb" "proxy-elb" {
 	name = "sa-health-proxy-elb"
 
-	subnets  = [ "${aws_subnet.us-east-1b-public.id}" ]
+	subnets  = [ "${aws_subnet.public.id}" ]
 	security_groups = [ "${aws_security_group.elb.id}" ]
 
 	listener {
@@ -131,6 +131,7 @@ resource "aws_elb" "proxy-elb" {
 	}
 }
 
+# FIXME(auxesis): refactor this out to a variable
 resource "aws_key_pair" "proxy-kp" {
 	key_name = "proxy-kp"
 	public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCBDR/3WUDKHgE6lVGyNuDn0/XOeHUc1sfkIDCuzl8wXZwrkBrk2tZnRuRgeVYIDvHwRyAAbWDC2yakSsJqzI995Jfc0VU2mdV0sZVqpEH/ijdQ/ykZlqU+91y3dvL+iFEh/4kd0Tw87MKYwkUC0KYI7uFoxDDhDIsE20aVlnYB/JCHLr/xpSbpok0G+dcGdIOWQdiSLKC9OacTWrOLCgq7z9i1QUiu4VBaItO2lJxQSQo/4pWtXWW82+CXLApVQN7tfZavpr7yrralAg0oNciK6ZAYIVdvc0UltvaynhBYP44xK3nCaQXCrqE4Q7mNEjMZI7B8hb14Z18J9lE/L0F3"
@@ -165,13 +166,13 @@ resource "aws_launch_configuration" "proxy-lc" {
 
 resource "aws_autoscaling_group" "proxy-asg" {
 	name = "sa_health_food_prosecutions_register_proxy-asg"
-	availability_zones = [ "us-east-1b" ]
+	availability_zones = ["${split(",", var.aws_availability_zones)}"]
 	min_size = 1
 	max_size = 1
 	health_check_type = "EC2"
 
 	launch_configuration = "${aws_launch_configuration.proxy-lc.name}"
-	vpc_zone_identifier  = [ "${aws_subnet.us-east-1b-public.id}" ]
+	vpc_zone_identifier  = [ "${aws_subnet.public.id}" ]
 	load_balancers       = ["${aws_elb.proxy-elb.name}"]
 
 	lifecycle {
