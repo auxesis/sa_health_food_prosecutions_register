@@ -15,5 +15,6 @@ export PATH="$PATH:$(pwd)/bin"
 
 # Remote configs
 terraform remote config -backend=S3 -backend-config="bucket=$BUCKET" -backend-config="key=terraform.tfstate" -backend-config="region=us-east-1"
+terraform remote pull
 
 make plan
