@@ -95,8 +95,11 @@ Terraform relies on `.tfstate` files to track state and changes between Terrafor
 
 For Terraform's state push/pull to work in CI, there are some additional things you need to set up:
 
- 1. Create an S3 bucket (named, for example, `sa_health_food_prosecutions_register`)
- 1. Attach this inline policy to the IAM user you previously created (and modify the bucket name):
+ 1. Create an S3 bucket (named, for example, `sa-health-food-prosecutions-register`)
+ ```
+ aws s3api create-bucket --bucket sa-health-food-prosecutions-register
+ ```
+ 1. Attach this inline policy to the IAM user you previously created (modifying the bucket name appropriately):
  ``` json
  {
       "Version": "2012-10-17",
