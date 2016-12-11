@@ -22,6 +22,14 @@ When the scraper runs, it detects if the `MORPH_PROXY` environment variable is s
 
 The scraper only emits that it's using a proxy – it doesn't emit the exact details of the proxy. Although access to the proxy service is locked down, it's best to not emit too much information about it.
 
+To get the `<host>` for `MORPH_PROXY`, run this once you've built the service with Terraform:
+
+```
+aws elb describe-load-balancers --load-balancer-name=sa-health-proxy-elb --output text --query 'LoadBalancerDescriptions[0].DNSName'
+```
+
+When you take the output of the above commend, the value of `MORPH_PROXY` will be something like `sa-health-proxy-elb-78456123.us-east-1.elb.amazonaws.com:8888`.
+
 ### Designed to be cheap and resilient
 
 The proxy service must be:
