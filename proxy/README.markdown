@@ -57,7 +57,7 @@ Use the access keys you generated to export the `TF_VAR_aws_access_key` and `TF_
 
 ```
 export TF_VAR_aws_access_key='A***REMOVED***'
-export TF_VAR_aws_secret_key='***REMOVED***'
+export TF_VAR_aws_secret_key='***REMOVED***+***REMOVED***
 ```
 
 Then to plan your changes:

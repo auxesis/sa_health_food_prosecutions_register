@@ -8,5 +8,5 @@ variable "aws_availability_zones" {
 }
 # Comma separated list of CIDRs the ELB should allow access from.
 variable "morph_cidrs" {
-	default = "50.116.3.88/32,104.237.132.0/24"
+	default = "50.116.3.88/32"
 }
