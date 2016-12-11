@@ -8,9 +8,9 @@ The `sa_health_food_prosecutions_register` scraper runs on [Morph](https://morph
 
 The scraper scrapes the [food prosecutions register](http://www.sahealth.sa.gov.au/wps/wcm/connect/public+content/sa+health+internet/about+us/legislation/food+legislation/food+prosecution+register) from the [SA Health website](http://sahealth.sa.gov.au/).
 
-The SA health website sits behind some sort of Web Application Firewall. It's assumed this WAF blocks nasty requests to the website.
+The SA health website sits behind some sort of Web Application Firewall. It's assumed this WAF is meant to block nasty requests to the website.
 
-The WAF blocks legitimate requests from Morph, which means the scraper fails to run. The WAF sometimes returns a HTTP status code of 200 but with an error message in the body. Sometimes it just silently drops the TCP connection altogether. Not nice.
+Unfortunately, the WAF blocks legitimate requests from Morph, which means the scraper fails to run. The WAF sometimes returns a HTTP status code of 200 but with an error message in the body. Sometimes it just silently drops the TCP connection altogether. Not nice.
 
 To make the scraper work on Morph, we can use [Tinyproxy](https://tinyproxy.github.io/) running on AWS to proxy requests from Morph to SA Health's website. The proxy is locked down to only accept requests originating from Morph.
 
