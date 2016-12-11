@@ -41,15 +41,22 @@ The Terraform config will:
 
 ## Setup the proxy
 
+First, the basics:
+
+```
+git clone https://github.com/auxesis/sa_health_food_prosecutions_register.git
+cd sa_health_food_prosecutions_register/proxy
+```
+
 ### You need Terraform and an IAM user
 
 Ensure you have installed Terraform, at least at version 0.7.13.
 
 There are a few things you need to configure on AWS before you can run Terraform:
 
- 1. Create an IAM user. You should probably name it for the thing you're proxying (for example, `sa_health_food_prosecutions_register`).
+ 1. Create an IAM user, with programatic access only. You should probably name it for the thing you're proxying (for example, `sa_health_food_prosecutions_register`).
  1. Attach `AmazonEC2FullAccess` and `AmazonVPCFullAccess` policies to IAM user)
- 1. Create access keys for the IAM user.
+ 1. Create access keys for the IAM user (this should happen automatically when you create the new user through the console)
 
 ### Drive changes with `make` and environment variables
 
@@ -77,3 +84,48 @@ To destroy the environment:
 ```
 make destroy
 ```
+
+#### There are extra steps if you're running Terraform changes through CI
+
+To keep Terraform changes consistent, all changes to the `sa_health_food_prosecutions_register` proxy are run through a Continuous Deployment pipeline [on Travis](https://travis-ci.org/auxesis/sa_health_food_prosecutions_register).
+
+Terraform relies on `.tfstate` files to track state and changes between Terraform runs. Because Travis starts with a clean git clone every build, we use `terraform config` push/pull to persist state across builds.
+
+For Terraform's state push/pull to work in CI, there are some additional things you need to set up:
+
+ 1. Create an S3 bucket (named, for example, `sa_health_food_prosecutions_register`)
+ 1. Attach this inline policy to the IAM user you previously created (and modify the bucket name):
+ ``` json
+ {
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:*"
+            ],
+            "Resource": [
+                "arn:aws:s3:::sa-health-food-prosecutions-register-proxy",
+                "arn:aws:s3:::sa-health-food-prosecutions-register-proxy/*"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": "s3:ListAllMyBuckets",
+            "Resource": "arn:aws:s3:::*"
+        }
+      ]
+ }
+ ```
+
+The [pipeline is very simple](https://github.com/auxesis/sa_health_food_prosecutions_register/blob/master/.travis.yml) – it just runs `proxy/cibuild.sh` and `proxy/cideploy.sh`.
+
+These environment variables must be exported for `proxy/cibuild.sh` and `proxy/cideploy.sh` to work:
+
+ - `BUCKET`, the name of the S3 bucket the config will be sync'd with by `terraform config`
+ - `AWS_ACCESS_KEY_ID`, access key for the IAM user, used by `terraform config`
+ - `AWS_SECRET_ACCESS_KEY`, access key secret for the IAM user, used by `terraform config`
+ - `TF_VAR_aws_access_key`, access key for the IAM user, used by `terraform plan` and `terraform apply`
+ - `TF_VAR_aws_secret_key`, access key secret for the IAM user, used by `terraform plan` and `terraform apply`
+
+These environment variables are exported as [encrypted environment variables](https://docs.travis-ci.com/user/environment-variables/#Defining-encrypted-variables-in-.travis.yml) in [.travis.yml](https://github.com/auxesis/sa_health_food_prosecutions_register/blob/master/.travis.yml).
