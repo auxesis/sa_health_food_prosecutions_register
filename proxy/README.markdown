@@ -56,8 +56,8 @@ There are a few things you need to configure on AWS before you can run Terraform
 Use the access keys you generated to export the `TF_VAR_aws_access_key` and `TF_VAR_aws_secret_key` environment variables:
 
 ```
-export TF_VAR_aws_access_key='A***REMOVED***'
-export TF_VAR_aws_secret_key='***REMOVED***+***REMOVED***
+export TF_VAR_aws_access_key='AAAAAAAAAAAAAAA'
+export TF_VAR_aws_secret_key='RRRRRRRRRRRRRRRRRRRRRGGGGGGGGGGHHHH'
 ```
 
 Then to plan your changes:
