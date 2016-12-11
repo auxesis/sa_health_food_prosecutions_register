@@ -87,6 +87,8 @@ make destroy
 
 #### There are extra steps if you're running Terraform changes through CI
 
+![Travis build status](https://travis-ci.org/auxesis/sa_health_food_prosecutions_register.svg?branch=master)
+
 To keep Terraform changes consistent, all changes to the `sa_health_food_prosecutions_register` proxy are run through a Continuous Deployment pipeline [on Travis](https://travis-ci.org/auxesis/sa_health_food_prosecutions_register).
 
 Terraform relies on `.tfstate` files to track state and changes between Terraform runs. Because Travis starts with a clean git clone every build, we use `terraform config` push/pull to persist state across builds.
