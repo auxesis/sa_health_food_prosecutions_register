@@ -169,7 +169,7 @@ resource "aws_autoscaling_group" "proxy-asg" {
 	availability_zones = ["${split(",", var.aws_availability_zones)}"]
 	min_size = 1
 	max_size = 1
-	health_check_type = "EC2"
+	health_check_type = "ELB"
 
 	launch_configuration = "${aws_launch_configuration.proxy-lc.name}"
 	vpc_zone_identifier  = [ "${aws_subnet.public.id}" ]
