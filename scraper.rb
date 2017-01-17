@@ -13,6 +13,16 @@ require 'pry'
 require 'active_support'
 require 'active_support/core_ext'
 require 'reverse_markdown'
+require 'webmock'
+
+require 'webmock'
+include WebMock::API
+WebMock.enable!
+
+stub_request(:get, "http://www.sahealth.sa.gov.au/wps/wcm/connect/public+content/sa+health+internet/about+us/legislation/food+legislation/food+prosecution+register").
+  to_return(:status => 200, :body => File.read('register.html'), :headers => { 'Content-Type' => 'text/html'})
+
+WebMock.disable_net_connect!(allow: 'maps.google.com')
 
 # Set an API key if provided
 Geokit::Geocoders::GoogleGeocoder.api_key = ENV['MORPH_GOOGLE_API_KEY'] if ENV['MORPH_GOOGLE_API_KEY']
