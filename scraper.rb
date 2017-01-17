@@ -117,9 +117,9 @@ def extract_attrs(page)
   end
 
   # Victim of Crime Levy
-  # 'victim' is singular and pluralised, so match on both because wtf
-  text = page.find {|e| e.text =~ /victims* of crime( levy)*:*/i}.text
-  attrs['victims_of_crime_levy'] = text[/^victims* of crime( levy)*:*.(.*)/i, 2]
+  # 'victim' is singular, pluralised, and abbreviate, so match on all because wtf
+  text = page.find {|e| e.text =~ /vic(tims*)* of crime( levy)*:*/i}.text
+  attrs['victims_of_crime_levy'] = text[/^vic(tims*)* of crime( levy)*:*.(.*)/i, 2]
 
   # Total Penalty
   text = page.find {|e| e.text =~ /total( penalty)*:/i}.text
