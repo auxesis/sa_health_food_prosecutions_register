@@ -144,6 +144,22 @@ def extract_ids(page)
   }
 end
 
+# The prosecutions are published in a big WYSIWYG text field.
+# There are no <div> tags to separate each prosecution.
+# This makes scraping prosecutions hard, because where do they start and end?
+#
+# This method:
+#
+# 1. Finds the header element for the offence, i.e. `#Moo View Dairy`'s parent
+# 2. Find to the next element, and
+# 2.1 If it's not a header node, add it to the collection
+# 2.2 If it's a header node, stop
+#
+# This gives us a nice chunk of HTML that represents the prosecution in
+# isolation from the other prosecutions.
+#
+# Then build_prosecution tries to extract any attributes it can from the HTML.
+#
 def build_prosecution(attrs, page)
   doc = Nokogiri::HTML(page.body) {|c| c.noblanks}
   elements = doc.search('div.wysiwyg').first.children
